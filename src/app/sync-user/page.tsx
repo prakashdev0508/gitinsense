@@ -25,10 +25,13 @@ const page = async () => {
       name: userDetails?.fullName,
       imageUrl: userDetails?.imageUrl,
       email: userDetails?.emailAddresses[0]?.emailAddress ?? "",
+      externalId : userDetails?.id
     },
     update: {
       imageUrl: userDetails?.imageUrl,
       name: userDetails?.fullName,
+      externalId : userDetails.id
+      
     },
   });
 

@@ -1,7 +1,28 @@
+import { AppSidebar } from "@/components/shared/app-sidebar";
+import DashboardHeader from "@/components/shared/DashboardHeader";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import React from "react";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
-  return <div>{children}</div>;
+  return (
+    <div>
+      {" "}
+      <SidebarProvider>
+        <AppSidebar />
+
+        <SidebarInset className=" shadow-none">
+          <div className=" border-b-[1px] border-gray-200 bg-white shadow-none ">
+            <header className="flex  justify-between h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+              <DashboardHeader />
+            </header>
+          </div>
+          <div className="flex flex-1 mt-3 flex-col gap-4 p-2 ">
+            {children}
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </div>
+  );
 };
 
 export default layout;
