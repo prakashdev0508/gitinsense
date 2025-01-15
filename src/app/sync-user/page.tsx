@@ -1,6 +1,7 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import React from "react";
 import { db } from "@/server/db";
+import { notFound, redirect } from "next/navigation";
 
 const page = async () => {
   const { userId } = await auth();
@@ -11,6 +12,10 @@ const page = async () => {
 
   const client = await clerkClient();
   const userDetails = await client.users.getUser(userId);
+
+  if (!userDetails) {
+    return notFound();
+  }
 
   await db.user.upsert({
     where: {
@@ -27,7 +32,7 @@ const page = async () => {
     },
   });
 
-  return <div className=" h-96 flex justify-center align-middle ">Sync-user </div>;
+  return redirect("/dashboard");
 };
 
 export default page;
