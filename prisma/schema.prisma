@@ -14,7 +14,7 @@ model User {
     name  String?
 
     imageUrl String?
-    cradits  Int     @default(150)
+    credits  Int     @default(150)
 
     projects Projects[]
 
