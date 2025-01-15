@@ -27,6 +27,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import useProjects from "@/hooks/use-projects";
 
 // This is sample data.
 const data = {
@@ -52,7 +53,20 @@ const data = {
       plan: "Free",
     },
   ],
-  navMain: [
+};
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { projects } = useProjects();
+
+  const projectData = projects?.map((project) => {
+    return {
+      title: project.name,
+      url: `/project/${project?.id}`,
+      id : project?.id
+    };
+  });
+
+  const mainNavData = [
     {
       title: "Dashboard",
       url: "/dashboard",
@@ -72,33 +86,22 @@ const data = {
       title: "Repositories",
       url: "#",
       icon: Folder,
-      items: [
-        {
-          title: "Project1",
-          url: "/project/projectID",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-      ],
+      items: projectData,
     },
     {
       title: "Billings",
       url: "/billings",
       icon: Settings2,
     },
-  ],
-};
+  ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={mainNavData} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

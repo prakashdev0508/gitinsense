@@ -18,6 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import useProjects from "@/hooks/use-projects";
 
 export function NavMain({
   items,
@@ -30,9 +31,12 @@ export function NavMain({
     items?: {
       title: string;
       url: string;
+      id: string;
     }[];
   }[];
 }) {
+  const { setSelectedProjectId } = useProjects();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -60,7 +64,12 @@ export function NavMain({
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <Link href={subItem.url}>
+                          <Link
+                            href={subItem.url}
+                            onClick={() => {
+                              setSelectedProjectId(subItem?.id);
+                            }}
+                          >
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>
