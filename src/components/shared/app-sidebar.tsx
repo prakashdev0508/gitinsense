@@ -1,67 +1,109 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+"use client";
 
+import * as React from "react";
+import {
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Folder,
+  Frame,
+  GalleryVerticalEnd,
+  Map,
+  PieChart,
+  Settings2,
+  SquareTerminal,
+  Tv,
+} from "lucide-react";
+
+import { NavMain } from "./sidebar/nav-main";
+import { NavProjects } from "./sidebar/nav-projects";
+import { NavUser } from "./sidebar/nav-user";
+import { TeamSwitcher } from "./sidebar/team-switcher";
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar"
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+} from "@/components/ui/sidebar";
 
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
+// This is sample data.
+const data = {
+  user: {
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
   },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-]
+  teams: [
+    {
+      name: "Github Ai",
+      logo: GalleryVerticalEnd,
+      plan: "Enterprise",
+    },
+    {
+      name: "Acme Corp.",
+      logo: AudioWaveform,
+      plan: "Startup",
+    },
+    {
+      name: "Evil Corp.",
+      logo: Command,
+      plan: "Free",
+    },
+  ],
+  navMain: [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: SquareTerminal,
+    },
+    {
+      title: "Q&A",
+      url: "/saved-answer",
+      icon: Bot,
+    },
+    {
+      title: "Meetings",
+      url: "/meetings",
+      icon: Tv,
+    },
+    {
+      title: "Repositories",
+      url: "#",
+      icon: Folder,
+      items: [
+        {
+          title: "Project1",
+          url: "/project/projectID",
+        },
+        {
+          title: "Starred",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Billings",
+      url: "/billings",
+      icon: Settings2,
+    },
+  ],
+};
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader>
+        <TeamSwitcher teams={data.teams} />
+      </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <NavMain items={data.navMain} />
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={data.user} />
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
-  )
+  );
 }
