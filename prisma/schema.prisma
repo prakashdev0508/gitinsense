@@ -41,7 +41,6 @@ model Projects {
 
 model CommitLogs {
     id    String     @id @default(cuid())
-    message String
     sha String
     commitDate DateTime
     commitAuthor String
