@@ -46,7 +46,8 @@ model CommitLogs {
     commitAuthor String
     commitAuthorImage String
 
-    fileChanged Int?
+    fileChanged Json?
+    commitMesage String
     linesAdded Int?
     linesDeleted Int?
 

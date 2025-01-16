@@ -1,3 +1,4 @@
+import { pollCommits } from "@/lib/githubData"
 
 export default async function Page({
     params,
