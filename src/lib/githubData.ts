@@ -32,6 +32,8 @@ export const pollCommits = async (projectId: string) => {
     const commits = await getCommits(githubUrl);
     const unprocessedCommits = await getUnprocessedCommits(projectId, commits);
 
+    console.log(unprocessedCommits)
+
     const summarizedCode = await Promise.allSettled(
       unprocessedCommits.map((commit) =>
         summerizeCommits(githubUrl, commit.sha),
@@ -70,8 +72,10 @@ export const pollCommits = async (projectId: string) => {
       .filter((log): log is NonNullable<typeof log> => log !== null);
 
     await db.commitLogs.createMany({ data: commitLogs });
+    return true
   } catch (error) {
     console.error("Error polling commits:", error);
+    return false
   }
 };
 export const summerizeCommits = async (githubUrl: string, sha: string) => {
@@ -159,7 +163,7 @@ export const getUnprocessedCommits = async (
 
   const unprocessedCommits = commits
     .filter((commit) => {
-      return !processedCommits.some((c) => c.sha === commit.sha);
+      return processedCommits.some((c) => c.sha !== commit.sha);
     })
     .slice(0, 5);
 

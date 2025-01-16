@@ -1,0 +1,222 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { RefreshCcwIcon } from "lucide-react";
+import { api } from "@/trpc/react";
+import useProjects from "@/hooks/use-projects";
+import { Badge } from "../ui/badge";
+import { Input } from "../ui/input";
+import useRefetch from "@/hooks/use-refetch";
+import { pollCommits } from "@/lib/githubData";
+import { toast } from "sonner";
+
+export default function CommitsPage({ projectId }: { projectId: string }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const commitsPerPage = 5;
+
+  const refetch = useRefetch();
+
+  const {
+    data: commitLogs,
+    isLoading,
+    isError,
+  } = api.project.getCommitsData.useQuery({
+    projectId: projectId,
+  });
+
+  const { selectedProject } = useProjects();
+
+  const sortedCommits = commitLogs?.sort((a: any, b: any) => {
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+
+    return dateA.getTime() - dateB.getTime();
+  });
+
+  // Filter commit logs based on the search query
+  const filteredCommits = sortedCommits?.filter((commit) => {
+    const commitMessageMatch = commit.commitMesage
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    return commitMessageMatch;
+  });
+
+  const totalCommits = filteredCommits?.length || 0;
+  const totalPages = Math.ceil(totalCommits / commitsPerPage);
+
+  const handlePageChange = (page: any) => {
+    setCurrentPage(page);
+  };
+
+  // Paginate the filtered commit logs
+  const paginatedCommits = filteredCommits?.slice(
+    (currentPage - 1) * commitsPerPage,
+    currentPage * commitsPerPage,
+  );
+
+  const fetchNewCommits = api.project.fetchNewCommits.useQuery({ projectId });
+
+  return (
+    <div className="mx-auto max-w-full">
+      {/* Header */}
+      {isLoading ? (
+        <>Loading..</>
+      ) : (
+        <>
+          {commitLogs?.length === 0 ? (
+            <>No project found</>
+          ) : (
+            <div className="px-4">
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <h1 className="text-xl font-semibold">
+                    {selectedProject?.name}
+                  </h1>
+                  <p className="text-sm text-gray-500">
+                    {selectedProject?.githubUrl}
+                  </p>
+                </div>
+              </div>
+
+              {/* Filters */}
+              <div className="mb-6 flex justify-end space-x-4">
+                {/* <div></div> */}
+                <Input
+                  type="text"
+                  placeholder="Search by commit message.."
+                  className="w-72"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <Button
+                  className=""
+                  title="Refresh commits"
+                  variant={"secondary"}
+                  onClick={() => {
+                    fetchNewCommits.refetch();
+                  }}
+                >
+                  <RefreshCcwIcon />
+                </Button>
+              </div>
+
+              {/* Commit List */}
+              {filteredCommits?.length == 0 ? (
+                <>Nothing in commit log</>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    {paginatedCommits?.map((commit, index) => (
+                      <div
+                        key={index}
+                        className="rounded-lg border border-gray-200 p-4"
+                      >
+                        <div className="flex justify-between">
+                          <div className="flex items-center space-x-4">
+                            <img
+                              src={commit.commitAuthorImage}
+                              alt={commit.commitAuthor}
+                              className="h-10 w-10 rounded-full"
+                            />
+                            <div>
+                              <h2 className="text-sm font-medium">
+                                {commit.commitMesage}
+                              </h2>
+                              <p className="text-xs text-gray-500">
+                                {commit.sha.slice(0, 5)} by{" "}
+                                <span className="ml-2">
+                                  {commit.commitAuthor}
+                                </span>{" "}
+                                · {new Date(commit.commitDate).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                          <div className=" ">
+                            <span className="ml-10 text-xs text-green-600">
+                              +{commit.linesAdded}
+                            </span>
+                            <span className="ml-2 text-xs text-red-600">
+                              +{commit.linesDeleted}
+                            </span>
+                          </div>
+                        </div>
+                        <pre className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-500">
+                          {""}
+                          {commit.summary}{" "}
+                        </pre>
+                        {/* File Changes */}
+                        <div className="mt-2 flex">
+                          {Array.isArray(commit.fileChanged) &&
+                            commit.fileChanged.map(
+                              (file: any, index: number) => {
+                                const filename = file.filename.split("/").pop();
+                                return (
+                                  <Badge
+                                    key={index}
+                                    className={`mx-2 bg-green-600`}
+                                  >
+                                    {filename}
+                                  </Badge>
+                                );
+                              },
+                            )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  <div className="mt-6 flex items-center justify-between">
+                    <p className="text-sm text-gray-500">
+                      Showing commits {currentPage * commitsPerPage - 4}-
+                      {currentPage * commitsPerPage} of {totalCommits}
+                    </p>
+                    <div className="flex space-x-2">
+                      <button
+                        disabled={currentPage === 1}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        className={`px-3 py-1 text-sm ${
+                          currentPage === 1
+                            ? "cursor-not-allowed bg-gray-200 text-gray-500"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        } rounded-lg`}
+                      >
+                        Previous
+                      </button>
+                      {Array.from({ length: totalPages }, (_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handlePageChange(index + 1)}
+                          className={`px-3 py-1 text-sm ${
+                            currentPage === index + 1
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          } rounded-lg`}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                      <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        className={`px-3 py-1 text-sm ${
+                          currentPage === totalPages
+                            ? "cursor-not-allowed bg-gray-200 text-gray-500"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        } rounded-lg`}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
