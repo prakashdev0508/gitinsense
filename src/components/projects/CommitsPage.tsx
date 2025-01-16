@@ -8,7 +8,6 @@ import useProjects from "@/hooks/use-projects";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 import useRefetch from "@/hooks/use-refetch";
-import { pollCommits } from "@/lib/githubData";
 import { toast } from "sonner";
 
 export default function CommitsPage({ projectId }: { projectId: string }) {
@@ -25,6 +24,10 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
   } = api.project.getCommitsData.useQuery({
     projectId: projectId,
   });
+
+  console.log(commitLogs)
+
+  const fetchNewCommits = api.project.fetchNewCommits.useMutation();
 
   const { selectedProject } = useProjects();
 
@@ -56,17 +59,14 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
     currentPage * commitsPerPage,
   );
 
-  const fetchNewCommits = api.project.fetchNewCommits.useQuery({ projectId });
-
   return (
     <div className="mx-auto max-w-full">
-      {/* Header */}
       {isLoading ? (
         <>Loading..</>
       ) : (
         <>
           {commitLogs?.length === 0 ? (
-            <>No project found</>
+            <>No commits found</>
           ) : (
             <div className="px-4">
               <div className="mb-6 flex items-center justify-between">
@@ -82,7 +82,6 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
 
               {/* Filters */}
               <div className="mb-6 flex justify-end space-x-4">
-                {/* <div></div> */}
                 <Input
                   type="text"
                   placeholder="Search by commit message.."
@@ -91,14 +90,36 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <Button
-                  className=""
+                  className={`${
+                    fetchNewCommits.isPending ? "cursor-not-allowed" : ""
+                  }`}
                   title="Refresh commits"
                   variant={"secondary"}
                   onClick={() => {
-                    fetchNewCommits.refetch();
+                    if (!fetchNewCommits.isPending) {
+                      fetchNewCommits.mutate(
+                        {
+                          projectId,
+                        },
+                        {
+                          onSuccess: () => {
+                            refetch();
+                            toast.success("New commits fetched");
+                          },
+                          onError: () => {
+                            toast.error("Failed to fetch data");
+                          },
+                        },
+                      );
+                    }
                   }}
+                  disabled={fetchNewCommits.isPending}
                 >
-                  <RefreshCcwIcon />
+                  <RefreshCcwIcon
+                    className={`${
+                      fetchNewCommits.isPending ? "animate-spin" : ""
+                    }`}
+                  />
                 </Button>
               </div>
 
@@ -133,7 +154,7 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
                               </p>
                             </div>
                           </div>
-                          <div className=" ">
+                          <div>
                             <span className="ml-10 text-xs text-green-600">
                               +{commit.linesAdded}
                             </span>
@@ -143,10 +164,8 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
                           </div>
                         </div>
                         <pre className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-500">
-                          {""}
-                          {commit.summary}{" "}
+                          {commit.summary}
                         </pre>
-                        {/* File Changes */}
                         <div className="mt-2 flex">
                           {Array.isArray(commit.fileChanged) &&
                             commit.fileChanged.map(

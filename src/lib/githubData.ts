@@ -32,7 +32,7 @@ export const pollCommits = async (projectId: string) => {
     const commits = await getCommits(githubUrl);
     const unprocessedCommits = await getUnprocessedCommits(projectId, commits);
 
-    console.log(unprocessedCommits)
+    console.log("unpp" , unprocessedCommits)
 
     const summarizedCode = await Promise.allSettled(
       unprocessedCommits.map((commit) =>
@@ -157,15 +157,15 @@ export const getUnprocessedCommits = async (
 ) => {
   const processedCommits = await db.commitLogs.findMany({
     where: {
-      id: projectId,
+      projectId: projectId,
     },
   });
 
   const unprocessedCommits = commits
     .filter((commit) => {
-      return processedCommits.some((c) => c.sha !== commit.sha);
+      return !processedCommits.find((c) => c.sha === commit.sha);
     })
-    .slice(0, 5);
 
-  return unprocessedCommits;
+
+  return unprocessedCommits.slice(0 ,5);
 };
