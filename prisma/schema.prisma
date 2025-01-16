@@ -41,13 +41,13 @@ model Projects {
 
 model CommitLogs {
     id    String     @id @default(cuid())
-    message String
     sha String
     commitDate DateTime
     commitAuthor String
     commitAuthorImage String
 
-    fileChanged Int?
+    fileChanged Json?
+    commitMesage String
     linesAdded Int?
     linesDeleted Int?
 

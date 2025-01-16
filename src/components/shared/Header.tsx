@@ -11,7 +11,7 @@ const Header = () => {
   const { isSignedIn } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/50  backdrop-blur-md">
+    <header className="sticky top-0 z-50 bg-white/50 backdrop-blur-md">
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
         {/* Logo Section */}
         <div className="text-xl font-bold">
@@ -21,11 +21,22 @@ const Header = () => {
         {/* Authentication Buttons */}
         <div>
           {isSignedIn ? (
-            <UserButton afterSignOutUrl="/" />
+            <div className="flex">
+            <Link href={"/dashboard"} className=" mr-3" >
+              <Button size={"sm"}>
+                {" "}
+                Dashboard <ArrowRight />{" "}
+              </Button>
+            </Link>
+            <div>
+
+              <UserButton afterSignOutUrl="/"  />
+            </div>
+            </div>
           ) : (
             <Link href={"/sign-in"}>
               <Button>
-                Login {" " } <ArrowRight />
+                Login <ArrowRight />
               </Button>
             </Link>
           )}
