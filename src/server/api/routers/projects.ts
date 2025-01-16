@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { pollCommits } from "@/lib/githubData";
 
 export const projectRouter = createTRPCRouter({
   createProject: protectedProcedure
@@ -11,7 +12,7 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      console.log("userId" , ctx.user.userId)
+      console.log("userId", ctx.user.userId);
       const project = await ctx.db.projects.create({
         data: {
           name: input.name,
@@ -31,4 +32,35 @@ export const projectRouter = createTRPCRouter({
     });
     return projects;
   }),
+
+  getCommitsData: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const commites = await ctx.db.commitLogs.findMany({
+        where: {
+          projectId: input.projectId,
+        },
+      });
+      return commites;
+    }),
+
+  fetchNewCommits: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      pollCommits(input.projectId).then().catch(console.error);
+      const commites = await ctx.db.commitLogs.findMany({
+        where: {
+          projectId: input.projectId,
+        },
+      });
+      return commites;
+    }),
 });
