@@ -8,8 +8,6 @@ export default async function Page({
 }) {
   const slug = (await params).slug;
 
-  
-
   return (
     <div>
       <CommitsPage projectId={slug} />
