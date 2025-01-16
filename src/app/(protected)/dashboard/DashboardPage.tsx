@@ -1,6 +1,7 @@
+import { getCommits } from '@/lib/githubData'
 import React from 'react'
 
-const DashboardPage = () => {
+const DashboardPage = async() => {
   return (
     <div>
         Dashboard 
