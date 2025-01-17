@@ -25,8 +25,6 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
     projectId: projectId,
   });
 
-  console.log(commitLogs)
-
   const fetchNewCommits = api.project.fetchNewCommits.useMutation();
 
   const { selectedProject } = useProjects();

@@ -32,8 +32,6 @@ export const pollCommits = async (projectId: string) => {
     const commits = await getCommits(githubUrl);
     const unprocessedCommits = await getUnprocessedCommits(projectId, commits);
 
-    console.log("unpp" , unprocessedCommits)
-
     const summarizedCode = await Promise.allSettled(
       unprocessedCommits.map((commit) =>
         summerizeCommits(githubUrl, commit.sha),
