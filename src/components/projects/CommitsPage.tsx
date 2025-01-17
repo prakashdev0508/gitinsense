@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { RefreshCcwIcon } from "lucide-react";
+import { RefreshCcwIcon, Share } from "lucide-react";
 import { api } from "@/trpc/react";
 import useProjects from "@/hooks/use-projects";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 import useRefetch from "@/hooks/use-refetch";
 import { toast } from "sonner";
+import { generateToken } from "@/utils/jwtTokens";
 
 export default function CommitsPage({ projectId }: { projectId: string }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,68 +58,78 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
     currentPage * commitsPerPage,
   );
 
+  const generateShareableLink = (commitId: string) => {
+    try {
+      const token = generateToken(commitId); // Ensure commitId is correct
+      const url = `${window.location.origin}/share/commit-details/${token}`;
+      navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard!");
+      return url;
+    } catch (error) {
+      console.error("Failed to generate token or link", error);
+      toast.error("Failed to generate shareable link.");
+    }
+  };
+  
+
   return (
     <div className="mx-auto max-w-full">
       {isLoading ? (
-        <>Loading..</>
+        <div className="grid h-screen place-items-center">
+          Loading Commit logs
+        </div>
       ) : (
         <>
           {commitLogs?.length === 0 ? (
             <>No commits found</>
           ) : (
-            <div className="px-4">
-              <div className="mb-6 flex items-center justify-between">
-                <div>
-                  <h1 className="text-xl font-semibold">
-                    {selectedProject?.name}
-                  </h1>
-                  <p className="text-sm text-gray-500">
-                    {selectedProject?.githubUrl}
-                  </p>
-                </div>
-              </div>
-
+            <div className="">
               {/* Filters */}
-              <div className="mb-6 flex justify-end space-x-4">
-                <Input
-                  type="text"
-                  placeholder="Search by commit message.."
-                  className="w-72"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Button
-                  className={`${
-                    fetchNewCommits.isPending ? "cursor-not-allowed" : ""
-                  }`}
-                  title="Refresh commits"
-                  variant={"secondary"}
-                  onClick={() => {
-                    if (!fetchNewCommits.isPending) {
-                      fetchNewCommits.mutate(
-                        {
-                          projectId,
-                        },
-                        {
-                          onSuccess: () => {
-                            refetch();
-                            toast.success("New commits fetched");
-                          },
-                          onError: () => {
-                            toast.error("Failed to fetch data");
-                          },
-                        },
-                      );
-                    }
-                  }}
-                  disabled={fetchNewCommits.isPending}
-                >
-                  <RefreshCcwIcon
-                    className={`${
-                      fetchNewCommits.isPending ? "animate-spin" : ""
-                    }`}
+              <div className="mb-6 flex justify-between space-x-4">
+                <div className="mt-3">
+                  <b>Commits Logs</b>
+                </div>
+                <div className="flex">
+                  <Input
+                    type="text"
+                    placeholder="Search by commit message.."
+                    className="w-72"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
-                </Button>
+                  <Button
+                    className={`${
+                      fetchNewCommits.isPending ? "cursor-not-allowed" : ""
+                    }ml-3`}
+                    title="Refresh commits"
+                    variant={"secondary"}
+                    onClick={() => {
+                      if (!fetchNewCommits.isPending) {
+                        fetchNewCommits.mutate(
+                          {
+                            projectId,
+                          },
+                          {
+                            onSuccess: () => {
+                              refetch();
+                              toast.success("New commits fetched");
+                            },
+                            onError: () => {
+                              toast.error("Failed to fetch data");
+                            },
+                          },
+                        );
+                      }
+                    }}
+                    disabled={fetchNewCommits.isPending}
+                  >
+                    <RefreshCcwIcon
+                      className={`${
+                        fetchNewCommits.isPending ? "animate-spin" : ""
+                      }`}
+                    />
+                  </Button>
+                </div>
               </div>
 
               {/* Commit List */}
@@ -158,6 +169,18 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
                             </span>
                             <span className="ml-2 text-xs text-red-600">
                               +{commit.linesDeleted}
+                            </span>
+                            <span className="ml-2">
+                              <Button
+                                variant="ghost"
+                                title="Share commit details"
+                                onClick={() => {
+                                  generateShareableLink(commit.id);
+                                }}
+                              >
+                                {" "}
+                                <Share />{" "}
+                              </Button>
                             </span>
                           </div>
                         </div>
