@@ -62,7 +62,7 @@ export function NavMain({
                 <CollapsibleContent className="transition-transform duration-200">
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
+                      <SidebarMenuSubItem key={subItem.id}>
                         <SidebarMenuSubButton asChild>
                           <Link
                             href={subItem.url}
