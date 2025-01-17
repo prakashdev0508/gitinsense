@@ -1,5 +1,5 @@
-import CommitsPage from "@/components/projects/CommitsPage";
-import { pollCommits } from "@/lib/githubData";
+import { verifyToken } from "@/utils/jwtTokens";
+import ShareCommitDetails from "./ShareCommitDetails";
 
 export default async function Page({
   params,
@@ -10,7 +10,7 @@ export default async function Page({
 
   return (
     <div className="px-4">
-      <CommitsPage projectId={slug} />
+      <ShareCommitDetails slug={slug} />
     </div>
   );
 }
