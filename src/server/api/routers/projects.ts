@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { pollCommits } from "@/lib/githubData";
+import { indexGithubRepo } from "@/lib/github-loader";
 
 export const projectRouter = createTRPCRouter({
   createProject: protectedProcedure
@@ -22,6 +23,7 @@ export const projectRouter = createTRPCRouter({
       });
 
       await pollCommits(project.id);
+      await indexGithubRepo(project.id, project.githubUrl);
       return true;
     }),
   getProjects: protectedProcedure.query(async ({ ctx, input }) => {
@@ -71,5 +73,29 @@ export const projectRouter = createTRPCRouter({
         },
       });
       return commit;
+    }),
+  refreshProject: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string().nonempty(),
+        githubUrl: z.string().nonempty(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await indexGithubRepo(input.projectId, input.githubUrl);
+    }),
+  getSingleProject: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string().nonempty(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const project = await ctx.db.projects.findUnique({
+        where: {
+          id: input.projectId,
+        },
+      });
+      return project;
     }),
 });

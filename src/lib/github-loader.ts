@@ -72,8 +72,6 @@ export const indexGithubRepo = async (
   const docs = await loadGithubRepo(githubUrl, githubToken);
   const allEmbeddings = await getEmbaddings(docs);
 
-  console.log("all", allEmbeddings);
-
   await Promise.allSettled(
     allEmbeddings.map(async (embedding, index) => {
       if (!embedding) return;
@@ -103,7 +101,6 @@ export const indexGithubRepo = async (
 };
 
 export const getEmbaddings = async (docs: Document[]) => {
-  console.log("Docs", docs[0]);
   const embeddings = await Promise.all(
     docs.map(async (doc) => {
       const summery = await summeriseCode(doc);

@@ -1,14 +1,11 @@
-
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
     previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-
-    
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+    provider   = "postgresql"
+    url        = env("DATABASE_URL")
     extensions = [vector]
 }
 
@@ -22,8 +19,10 @@ model User {
     credits  Int     @default(150)
 
     projects      Projects[]
-    questionAsked Int        @default(0)
-    aiUsed Int @default(0)
+    savedQuestion SavedAnswers[]
+
+    questionAsked Int @default(0)
+    aiUsed        Int @default(0)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -38,28 +37,26 @@ model Projects {
     user   User   @relation(fields: [userId], references: [externalId])
     userId String
 
-    commitLogs CommitLogs[]
-    sourceCode SourceCodeEmbeddings[]
+    commitLogs    CommitLogs[]
+    sourceCode    SourceCodeEmbeddings[]
+    savedQuestion SavedAnswers[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model SourceCodeEmbeddings {
-    id          String  @id @default(cuid())
-    fileName String @unique
+    id            String                      @id @default(cuid())
+    fileName      String                      @unique
     summeryVector Unsupported("vector(768)")?
-    summery String
-    sourceCode String
+    summery       String
+    sourceCode    String
 
     projectId String
-    project Projects @relation(fields: [projectId] , references: [id])
+    project   Projects @relation(fields: [projectId], references: [id])
 
-    
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-
-
 }
 
 model CommitLogs {
@@ -79,8 +76,24 @@ model CommitLogs {
     project   Projects @relation(fields: [projectId], references: [id])
     projectId String
 
-    
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model SavedAnswers {
+    id       String @id @default(cuid())
+    question String
+    answer   String
+
+    project   Projects @relation(fields: [projectId], references: [id])
+    projectId String
+
+    user   User   @relation(fields: [userId], references: [externalId])
+    userId String 
+
+    isDeletedAt DateTime?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
 }
