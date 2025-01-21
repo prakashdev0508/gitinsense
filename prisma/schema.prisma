@@ -1,63 +1,86 @@
 
 generator client {
     provider = "prisma-client-js"
+    previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
+
+    
     provider = "postgresql"
     url      = env("DATABASE_URL")
+    extensions = [vector]
 }
 
 model User {
-    id    String     @id @default(cuid())
-    email String  @unique
-    name  String?
-    externalId  String @unique
+    id         String  @id @default(cuid())
+    email      String  @unique
+    name       String?
+    externalId String  @unique
 
     imageUrl String?
     credits  Int     @default(150)
 
-    projects Projects[]
+    projects      Projects[]
+    questionAsked Int        @default(0)
+    aiUsed Int @default(0)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model Projects {
-    id    String     @id @default(cuid())
-    name  String
-    githubUrl String
+    id          String  @id @default(cuid())
+    name        String
+    githubUrl   String
     githubToken String?
 
-
-    user User @relation(fields: [userId], references: [externalId])
+    user   User   @relation(fields: [userId], references: [externalId])
     userId String
 
     commitLogs CommitLogs[]
+    sourceCode SourceCodeEmbeddings[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
+model SourceCodeEmbeddings {
+    id          String  @id @default(cuid())
+    fileName String @unique
+    summeryVector Unsupported("vector(768)")?
+    summery String
+    sourceCode String
+
+    projectId String
+    project Projects @relation(fields: [projectId] , references: [id])
+
+    
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+
+}
+
 model CommitLogs {
-    id    String     @id @default(cuid())
-    sha String
-    commitDate DateTime
-    commitAuthor String
+    id                String   @id @default(cuid())
+    sha               String
+    commitDate        DateTime
+    commitAuthor      String
     commitAuthorImage String
 
-    fileChanged Json?
+    fileChanged  Json?
     commitMesage String
-    linesAdded Int?
+    linesAdded   Int?
     linesDeleted Int?
 
     summary String?
 
-    project Projects @relation(fields: [projectId], references: [id])
+    project   Projects @relation(fields: [projectId], references: [id])
     projectId String
+
+    
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
-
- 

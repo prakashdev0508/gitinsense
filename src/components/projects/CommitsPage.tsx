@@ -70,7 +70,6 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
       toast.error("Failed to generate shareable link.");
     }
   };
-  
 
   return (
     <div className="mx-auto max-w-full">
@@ -81,7 +80,41 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
       ) : (
         <>
           {commitLogs?.length === 0 ? (
-            <>No commits found</>
+            <>
+              No commits found
+              <Button
+                className={`${
+                  fetchNewCommits.isPending ? "cursor-not-allowed" : ""
+                }ml-3`}
+                title="Refresh commits"
+                variant={"secondary"}
+                onClick={() => {
+                  if (!fetchNewCommits.isPending) {
+                    fetchNewCommits.mutate(
+                      {
+                        projectId,
+                      },
+                      {
+                        onSuccess: () => {
+                          refetch();
+                          toast.success("New commits fetched");
+                        },
+                        onError: () => {
+                          toast.error("Failed to fetch data");
+                        },
+                      },
+                    );
+                  }
+                }}
+                disabled={fetchNewCommits.isPending}
+              >
+                <RefreshCcwIcon
+                  className={`${
+                    fetchNewCommits.isPending ? "animate-spin" : ""
+                  }`}
+                />
+              </Button>
+            </>
           ) : (
             <div className="">
               {/* Filters */}
