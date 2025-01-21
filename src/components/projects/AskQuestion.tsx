@@ -7,8 +7,8 @@ import useProjects from "@/hooks/use-projects";
 import { askQuestion } from "./actions";
 import { readStreamableValue } from "ai/rsc";
 import { toast } from "sonner";
-import { Dialog } from "@radix-ui/react-dialog";
 import MDeditor from "@uiw/react-md-editor";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 
 const AskQuestion = () => {
   const [question, setQuestion] = useState("");
@@ -23,8 +23,9 @@ const AskQuestion = () => {
       return;
     }
     if (!selectedProject) return;
-    toast.success("Hoo gyaa bhai ")
+    toast.success("Hoo gyaa bhai ");
     setLoading(true);
+    setOpen(true);
     try {
       const { output } = await askQuestion(
         question,
@@ -32,11 +33,13 @@ const AskQuestion = () => {
         selectedProject.githubUrl,
       );
 
-      // for await (const delta of readStreamableValue(output)) {
-      //   if (delta) {
-      //     setAnswer((prev) => prev + delta);
-      //   }
-      // }
+      console.log(output);
+
+      for await (const delta of readStreamableValue(output)) {
+        if (delta) {
+          setAnswer((prev) => prev + delta);
+        }
+      }
 
       setLoading(false);
     } catch (error) {
@@ -55,15 +58,18 @@ const AskQuestion = () => {
             setLoading(false);
           }}
         >
-          <MDeditor.Markdown
-            source={answer}
-            className="no-scrollbar !h-full max-h-[60vh] max-w-[90vw] overflow-scroll bg-white"
-            style={{
-              whiteSpace: "pre-wrap",
-              backgroundColor: "white",
-              color: "black",
-            }}
-          />
+          <DialogContent className="max-h-[90vh] bg-white sm:max-w-[70vw]">
+            <DialogTitle> GitInsite </DialogTitle>
+            <MDeditor.Markdown
+              source={answer}
+              className="no-scrollbar !h-full max-h-[60vh] max-w-[90vw] overflow-scroll bg-white"
+              style={{
+                whiteSpace: "pre-wrap",
+                backgroundColor: "white",
+                color: "black",
+              }}
+            />
+          </DialogContent>
         </Dialog>
       )}
       <div className="rounded-md bg-white">
