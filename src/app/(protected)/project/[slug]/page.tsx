@@ -1,6 +1,5 @@
-import AskQuestion from "@/components/projects/AskQuestion";
 import CommitsPage from "@/components/projects/CommitsPage";
-import { pollCommits } from "@/lib/githubData";
+import ProjectPage from "./ProjectPage";
 
 export default async function Page({
   params,
@@ -11,12 +10,8 @@ export default async function Page({
 
   return (
     <div className="px-4">
-      <div className="grid grid-cols-3 gap-10">
-        <div className="col-span-3">
-          <AskQuestion />
-        </div >
-      </div>
-      <hr className="my-8" />
+      <ProjectPage projectId={slug} />
+      <div className="my-8" />
       <CommitsPage projectId={slug} />
     </div>
   );

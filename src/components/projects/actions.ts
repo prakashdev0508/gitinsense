@@ -39,9 +39,6 @@ export const askQuestion = async (
   for (const doc of result) {
     context += `source : ${doc.fileName} \ncode context : ${doc.sourceCode} \n summary : ${doc.summery} \n\n`;
   }
-
-  console.log("Context", context);
-
   (async () => {
     const { textStream } = streamText({
       model: google("gemini-1.5-flash"),
@@ -65,7 +62,6 @@ export const askQuestion = async (
       `,
     });
 
-    console.log(textStream)
 
     for await (const dalta of textStream) {
       stream.update(dalta);

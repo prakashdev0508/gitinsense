@@ -9,31 +9,31 @@ import { readStreamableValue } from "ai/rsc";
 import { toast } from "sonner";
 import MDeditor from "@uiw/react-md-editor";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
+import { api } from "@/trpc/react";
+import { Download, LoaderCircle, SaveIcon } from "lucide-react";
 
-const AskQuestion = () => {
+const AskQuestion = ({ projectData }: any) => {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState("");
   const [open, setOpen] = useState(false);
 
-  const { selectedProject } = useProjects();
+  const saveQuestion = api.saveQuestion.createSaveQuestion.useMutation();
 
   const handleSubmit = async () => {
     if (question.trim() == "") {
       return;
     }
-    if (!selectedProject) return;
-    toast.success("Hoo gyaa bhai ");
+    if (!projectData) return;
     setLoading(true);
-    setOpen(true);
     try {
       const { output } = await askQuestion(
         question,
-        selectedProject.id,
-        selectedProject.githubUrl,
+        projectData.id,
+        projectData.githubUrl,
       );
 
-      console.log(output);
+      setOpen(true);
 
       for await (const delta of readStreamableValue(output)) {
         if (delta) {
@@ -59,7 +59,53 @@ const AskQuestion = () => {
           }}
         >
           <DialogContent className="max-h-[90vh] bg-white sm:max-w-[70vw]">
-            <DialogTitle> GitInsite </DialogTitle>
+            <DialogTitle className="flex">
+              <div>GitInsite</div>
+              {loading && (
+                <div>
+                  {" "}
+                  <LoaderCircle
+                    className={loading ? "ml-2 animate-spin" : "ml-2"}
+                    size={17}
+                  />{" "}
+                </div>
+              )}
+              {saveQuestion.isPending ? (
+                <>
+                  <LoaderCircle className="ml-5 animate-spin" size={17} />{" "}
+                </>
+              ) : (
+                <>
+                  <div
+                    title="Save question answer"
+                    className="ml-5 cursor-pointer"
+                    onClick={() => {
+                      if (!saveQuestion.isPending) {
+                        saveQuestion.mutate(
+                          {
+                            projectId: projectData.id,
+                            question: question,
+                            answer: answer,
+                          },
+                          {
+                            onSuccess: () => {
+                              toast.success("Answer saved ");
+                            },
+                            onError: () => {
+                              toast.error(
+                                "Error saving answer please try again",
+                              );
+                            },
+                          },
+                        );
+                      }
+                    }}
+                  >
+                    <Download size={17} />
+                  </div>
+                </>
+              )}
+            </DialogTitle>
             <MDeditor.Markdown
               source={answer}
               className="no-scrollbar !h-full max-h-[60vh] max-w-[90vw] overflow-scroll bg-white"
@@ -73,10 +119,10 @@ const AskQuestion = () => {
         </Dialog>
       )}
       <div className="rounded-md bg-white">
-        <div className="mb-2 text-lg font-semibold">Analyze Repository</div>
+        <div className="text-lg font-semibold">Analyze Repository</div>
         <div className="flex items-center gap-4">
           <Input
-            placeholder="https://github.com/username/repository"
+            placeholder="Ask anything about this repo"
             onChange={(e) => setQuestion(e.target.value)}
             value={question}
             name="question"
@@ -84,9 +130,10 @@ const AskQuestion = () => {
           />
           <Button
             onClick={handleSubmit}
-            className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none"
+            disabled={loading}
           >
-            Analyze !!
+            {loading ? "Anylazing..." : "Anylaze !!"}
           </Button>
         </div>
       </div>

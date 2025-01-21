@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import SavedAnswer from "./SavedAnswer";
 
 const page = () => {
   return (
-    <div>page</div>
-  )
-}
+    <div>
+      <SavedAnswer />
+    </div>
+  );
+};
 
-export default page
+export default page;
