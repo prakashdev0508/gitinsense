@@ -195,7 +195,7 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
                         <pre className="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-500">
                           {commit.summary}
                         </pre>
-                        <div className="mt-2 flex">
+                        <div className="mt-2">
                           {Array.isArray(commit.fileChanged) &&
                             commit.fileChanged.map(
                               (file: any, index: number) => {
