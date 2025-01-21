@@ -78,12 +78,19 @@ export const indexGithubRepo = async (
     allEmbeddings.map(async (embedding, index) => {
       if (!embedding) return;
 
-      const sourceCodeEmbedding = await db.sourceCodeEmbeddings.create({
-        data: {
+      const sourceCodeEmbedding = await db.sourceCodeEmbeddings.upsert({
+        where: {
+          fileName: embedding.fileName,
+        },
+        create: {
           fileName: embedding.fileName,
           sourceCode: embedding.sourceCode,
           summery: embedding.summary,
           projectId: projectId,
+        },
+        update: {
+          sourceCode: embedding.sourceCode,
+          summery: embedding.summary,
         },
       });
 
@@ -96,6 +103,7 @@ export const indexGithubRepo = async (
 };
 
 export const getEmbaddings = async (docs: Document[]) => {
+  console.log("Docs", docs[0]);
   const embeddings = await Promise.all(
     docs.map(async (doc) => {
       const summery = await summeriseCode(doc);

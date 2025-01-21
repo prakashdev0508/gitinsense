@@ -69,7 +69,8 @@ export const summeriseCode = async (doc: Document) => {
     ]);
     return response.response.text();
   } catch (error) {
-    throw new Error("Error while getting summery of code ");
+    console.log(error)
+    return ""
   }
 };
 
