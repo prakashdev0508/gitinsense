@@ -23,7 +23,6 @@ export const projectRouter = createTRPCRouter({
       });
 
       await pollCommits(project.id);
-      await indexGithubRepo(project.id, project.githubUrl);
       return true;
     }),
   getProjects: protectedProcedure.query(async ({ ctx, input }) => {
