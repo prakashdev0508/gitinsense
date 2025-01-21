@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { RefreshCcwIcon, Share } from "lucide-react";
+import { ExternalLink, RefreshCcwIcon, Share } from "lucide-react";
 import { api } from "@/trpc/react";
 import useProjects from "@/hooks/use-projects";
 import { Badge } from "../ui/badge";
@@ -10,6 +10,7 @@ import { Input } from "../ui/input";
 import useRefetch from "@/hooks/use-refetch";
 import { toast } from "sonner";
 import { generateToken } from "@/utils/jwtTokens";
+import Link from "next/link";
 
 export default function CommitsPage({ projectId }: { projectId: string }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,9 +81,7 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
       ) : (
         <>
           {commitLogs?.length === 0 ? (
-            <>
-
-            </>
+            <></>
           ) : (
             <div className="">
               {/* Filters */}
@@ -169,10 +168,10 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
                               +{commit.linesAdded}
                             </span>
                             <span className="ml-2 text-xs text-red-600">
-                              +{commit.linesDeleted}
+                              -{commit.linesDeleted}
                             </span>
                             <span className="ml-2">
-                              <Button
+                              {/* <Button
                                 variant="ghost"
                                 title="Share commit details"
                                 onClick={() => {
@@ -181,7 +180,15 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
                               >
                                 {" "}
                                 <Share />{" "}
-                              </Button>
+                              </Button> */}
+                              <Link
+                                href={`${selectedProject?.githubUrl}/commit/${commit.sha}`}
+                                target="_blank"
+                              >
+                                <Button variant={"ghost"}>
+                                  <ExternalLink className="ml-1 size-4" />
+                                </Button>
+                              </Link>
                             </span>
                           </div>
                         </div>

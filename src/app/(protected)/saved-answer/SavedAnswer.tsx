@@ -26,7 +26,7 @@ const SavedAnswer = () => {
           >
             {/* Question Section */}
             <h3 className="mb-2 flex">
-              <div className="rounded-lg bg-blue-100/90 px-3 py-1 font-bold text-green-600">
+              <div className="rounded-lg bg-red-100/70 px-3 py-1 font-bold text-red-600">
                 {" "}
                 Q{" "}
               </div>
@@ -40,14 +40,14 @@ const SavedAnswer = () => {
                 expandedIndex === index ? "max-h-full" : "max-h-16"
               }`}
             >
-              <div className="h-8 rounded-lg bg-red-100/80 px-3 py-1 font-bold text-red-600">
+              <div className="h-8 rounded-lg bg-blue-100/80 px-3 py-1 font-bold text-green-600">
                 {" "}
                 A{" "}
               </div>
               <div className=" ml-3">
-                <p className="text-gray-600">
+                <p className="text-gray-600 ">
                   {expandedIndex !== index
-                    ? `${data.answer.slice(0, 270)}....`
+                    ? `${data.answer.slice(0, 260)}....`
                     : `${data.answer}`}
                 </p>
               </div>
