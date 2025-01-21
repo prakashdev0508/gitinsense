@@ -68,22 +68,18 @@ export const summeriseCode = async (doc: Document) => {
   `,
     ]);
     return response.response.text();
-    
   } catch (error) {
-    return ""
+    throw new Error("Error while getting summery of code ");
   }
 };
 
-export async function generateEmbedding(summery: string) {
-
-  const modal =  genAI.getGenerativeModel({
+export async function generateEmbedding(data: string) {
+  const modal = genAI.getGenerativeModel({
     model: "text-embedding-004",
   });
 
-  const response = await modal.embedContent(summery);
+  const response = await modal.embedContent(data);
   const embeddings = response.embedding;
 
   return embeddings.values;
 }
-
-

@@ -49,30 +49,32 @@ export function NavMain({
             className="group/collapsible"
           >
             <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  {item.items && item.items?.length > 0 && (
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                  )}
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
+              <Link href={item.url}>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip={item.title}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                    {item.items && item.items?.length > 0 && (
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    )}
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+              </Link>
               {item.items && item.items.length > 0 && (
                 <CollapsibleContent className="transition-transform duration-200">
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
-                          <Link
-                            href={subItem.url}
-                            onClick={() => {
-                              setSelectedProjectId(subItem?.id);
-                            }}
-                          >
+                      <SidebarMenuSubItem key={subItem.id}>
+                        <Link
+                          href={subItem.url}
+                          onClick={() => {
+                            setSelectedProjectId(subItem?.id);
+                          }}
+                        >
+                          <SidebarMenuSubButton asChild>
                             <span>{subItem.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
+                          </SidebarMenuSubButton>
+                        </Link>
                       </SidebarMenuSubItem>
                     ))}
                   </SidebarMenuSub>
