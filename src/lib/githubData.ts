@@ -70,10 +70,10 @@ export const pollCommits = async (projectId: string) => {
       .filter((log): log is NonNullable<typeof log> => log !== null);
 
     await db.commitLogs.createMany({ data: commitLogs });
-    return true
+    return true;
   } catch (error) {
     console.error("Error polling commits:", error);
-    return false
+    return false;
   }
 };
 export const summerizeCommits = async (githubUrl: string, sha: string) => {
@@ -114,7 +114,7 @@ export const getCommits = async (githubUrl: string) => {
 
   const sortedData = data.sort((a: any, b: any) => {
     return (
-      new Date(b.commit?.author.date).getTime() - 
+      new Date(b.commit?.author.date).getTime() -
       new Date(a.commit?.author.date).getTime()
     );
   });
@@ -144,7 +144,7 @@ export const getCommits = async (githubUrl: string) => {
         commitAutherAvatar: commit?.author?.avatar_url ?? "",
         filesChanged: filesChanged || [],
       };
-    })
+    }),
   );
 
   return detailedCommits;
@@ -159,11 +159,9 @@ export const getUnprocessedCommits = async (
     },
   });
 
-  const unprocessedCommits = commits
-    .filter((commit) => {
-      return !processedCommits.find((c) => c.sha === commit.sha);
-    })
+  const unprocessedCommits = commits.filter((commit) => {
+    return !processedCommits.find((c) => c.sha === commit.sha);
+  });
 
-
-  return unprocessedCommits.slice(0 ,5);
+  return unprocessedCommits.slice(0, 5);
 };
