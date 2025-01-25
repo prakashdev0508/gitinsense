@@ -17,6 +17,7 @@ const CreateProject = ({
   const [githubToken, setGithubToken] = useState("");
 
   const refetch = useRefetch();
+  
 
   const clearData = () => {
     setName("");
@@ -25,6 +26,8 @@ const CreateProject = ({
   };
 
   const createProject = api.project.createProject.useMutation();
+  const refreshProject = api.project.refreshProject.useMutation();
+  
 
   const handleCreate = () => {
     if (name.trim() == "" || githubUrl.trim() == "") {
@@ -38,11 +41,15 @@ const CreateProject = ({
         githubToken: githubToken,
       },
       {
-        onSuccess: async () => {
+        onSuccess: async (data) => {
           toast.success("Project created successfully");
           refetch();
           clearData();
           setOpen(false);
+          refreshProject.mutate({
+            githubUrl : data.githubUrl,
+            projectId : data.projectId
+          })          
         },
         onError: (error) => {
           toast.error(

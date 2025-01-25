@@ -131,7 +131,7 @@ const AskQuestion = ({ projectData }: any) => {
           <Button
             onClick={handleSubmit}
             className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none"
-            disabled={loading}
+            disabled={loading || question.trim().length <= 3}
           >
             {loading ? "Anylazing..." : "Anylaze !!"}
           </Button>

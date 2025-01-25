@@ -23,7 +23,10 @@ export const projectRouter = createTRPCRouter({
       });
 
       await pollCommits(project.id);
-      return true;
+      return {
+        projectId: project?.id,
+        githubUrl: project?.githubUrl as string,
+      };
     }),
   getProjects: protectedProcedure.query(async ({ ctx, input }) => {
     const projects = await ctx.db.projects.findMany({
@@ -86,6 +89,22 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await indexGithubRepo(input.projectId, input.githubUrl);
     }),
+
+  getprojectEmbaddingsCount: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string().nonempty(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const projectEmbaddingsCount = await ctx.db.sourceCodeEmbeddings.count({
+        where: {
+          projectId: input.projectId,
+        },
+      });
+      return projectEmbaddingsCount;
+    }),
+
   getSingleProject: protectedProcedure
     .input(
       z.object({

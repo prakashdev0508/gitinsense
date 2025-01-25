@@ -3,12 +3,13 @@ import useProjects from "@/hooks/use-projects";
 import { api } from "@/trpc/react";
 import { Folder, RefreshCcwIcon } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 
 const ProjectDetails = ({ projectData }: any) => {
-  const fetchNewCommits = api.project.refreshProject.useMutation();
+  const refreshProject = api.project.refreshProject.useMutation();
+
   return (
     <div>
       <div className="flex justify-between">
@@ -30,13 +31,13 @@ const ProjectDetails = ({ projectData }: any) => {
         <div>
           <Button
             className={`${
-              fetchNewCommits.isPending ? "cursor-not-allowed" : ""
+              refreshProject.isPending ? "cursor-not-allowed" : ""
             }ml-3`}
             title="Refresh commits"
             variant={"secondary"}
             onClick={() => {
-              if (!fetchNewCommits.isPending) {
-                fetchNewCommits.mutate(
+              if (!refreshProject.isPending) {
+                refreshProject.mutate(
                   {
                     projectId: projectData?.id,
                     githubUrl: projectData?.githubUrl as string,
@@ -52,10 +53,10 @@ const ProjectDetails = ({ projectData }: any) => {
                 );
               }
             }}
-            disabled={fetchNewCommits.isPending}
+            disabled={refreshProject.isPending}
           >
             <RefreshCcwIcon
-              className={`${fetchNewCommits.isPending ? "animate-spin" : ""}`}
+              className={`${refreshProject.isPending ? "animate-spin" : ""}`}
             />
           </Button>
         </div>

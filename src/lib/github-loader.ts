@@ -2,6 +2,7 @@ import { GithubRepoLoader } from "@langchain/community/document_loaders/web/gith
 import { Document } from "@langchain/core/documents";
 import { generateEmbedding, summeriseCode } from "./chatgpt";
 import { db } from "@/server/db";
+import PQueue from "p-queue";
 
 export const loadGithubRepo = async (
   githubUrl: string,
@@ -74,7 +75,9 @@ export const indexGithubRepo = async (
 
   await Promise.allSettled(
     allEmbeddings.map(async (embedding, index) => {
-      if (!embedding) return;
+      if (!embedding.sourceCode || !embedding.summary) return;
+
+      console.log("summ", embedding.summary);
 
       const sourceCodeEmbedding = await db.sourceCodeEmbeddings.upsert({
         where: {
@@ -100,18 +103,34 @@ export const indexGithubRepo = async (
   );
 };
 
+interface Embedding {
+  summary: string;
+  fileName: string;
+  embedding: any; // Replace `any` with the actual type if known
+  sourceCode: string;
+}
+
 export const getEmbaddings = async (docs: Document[]) => {
-  const embeddings = await Promise.all(
-    docs.map(async (doc) => {
-      const summery = await summeriseCode(doc);
-      const embedding = await generateEmbedding(summery);
-      return {
-        summary: summery,
-        fileName: doc.metadata.source,
-        embedding,
-        sourceCode: JSON.stringify(doc.pageContent),
-      };
-    }),
+  const queue = new PQueue({ concurrency: 5 });
+  const embeddings: Embedding[] = [];
+
+  await Promise.all(
+    docs.map((doc) =>
+      queue.add(async () => {
+        const summary = await summeriseCode(doc);
+        const embedding = await generateEmbedding(summary);
+        console.log("Summertttt" , summary)
+        if (summary && embedding && summary != "Error summarizing code.") {
+          embeddings.push({
+            summary,
+            fileName: doc.metadata.source,
+            embedding,
+            sourceCode: JSON.stringify(doc.pageContent),
+          });
+        }
+      }),
+    ),
   );
+
   return embeddings;
 };

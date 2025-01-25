@@ -1,5 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Document } from "@langchain/core/documents";
+import { HfInference } from "@huggingface/inference";
+
+const summarizer = new HfInference(process.env.HUGGINGFACE_API_KEY || "");
+
+
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
   throw new Error("GEMINI_API_KEY is not defined");
@@ -53,26 +58,50 @@ Please summarise the following diff file: \n\n${diff}`,
   return response.response.text();
 };
 
+
 export const summeriseCode = async (doc: Document) => {
   try {
-    const code = doc.pageContent.slice(0, 10000);
+    const code = doc.pageContent.slice(0, 10000); 
+    const response = await summarizer.summarization({
+      inputs: `${code}`,
+      model: "t5-small",
+      parameters: {
+        max_length: 100,
+        min_length: 50,
+      },
+    });
 
-    const response = await modal.generateContent([
-      `“You are an intelligent senior software engineer who specialises in onboarding junior software engineers onto projects.
-  “You are onboarding a junior software engineer and explaining to them the purpose of the ${doc.metadata.source} file. Here is the code 
-  ---
-      ${code}
-  
-  ---
-  Give a summary no more than 100 words of the code above.
-  `,
-    ]);
-    return response.response.text();
+    console.log( "Summ response " ,  response.summary_text)
+
+    return response.summary_text ;
   } catch (error) {
-    console.log(error)
-    return ""
+    console.error("Error summarizing code:", error);
+    return "Error summarizing code.";
   }
 };
+
+
+
+// export const summeriseCode = async (doc: Document) => {
+//   try {
+//     const code = doc.pageContent.slice(0, 10000);
+
+//     const response = await modal.generateContent([
+//       `“You are an intelligent senior software engineer who specialises in onboarding junior software engineers onto projects.
+//   “You are onboarding a junior software engineer and explaining to them the purpose of the ${doc.metadata.source} file. Here is the code 
+//   ---
+//       ${code}
+  
+//   ---
+//   Give a summary no more than 100 words of the code above.
+//   `,
+//     ]);
+//     return response.response.text();
+//   } catch (error) {
+//     console.log(error)
+//     return ""
+//   }
+// };
 
 export async function generateEmbedding(data: string) {
   const modal = genAI.getGenerativeModel({

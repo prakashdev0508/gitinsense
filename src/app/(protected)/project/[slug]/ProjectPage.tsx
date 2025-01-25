@@ -15,8 +15,6 @@ const ProjectPage = ({ projectId }: { projectId: string }) => {
     projectId: projectId,
   });
 
-  console.log("er", projectData);
-
   if (isLoading) {
     return (
       <div className="grid-cols-4 items-center gap-4 rounded-md px-5 py-8 shadow-md lg:grid lg:divide-x">

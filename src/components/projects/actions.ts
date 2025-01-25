@@ -23,7 +23,7 @@ export const askQuestion = async (
   const result = (await db.$queryRaw`
   SElECT "fileName" , "sourceCode" , "summery"  , 1 - ("summeryVector" <=> ${questionVectoryQuery}::vector ) as "similarity"
   FROM "SourceCodeEmbeddings" 
-  WHERE 1 - ("summeryVector" <=> ${questionVectoryQuery}::vector ) > 0.5
+  WHERE 1 - ("summeryVector" <=> ${questionVectoryQuery}::vector ) > 0.4
   AND "projectId" = ${projectId}
   ORDER BY "similarity" DESC
   LIMIT 10
