@@ -36,6 +36,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invlaid" }, { status: 400 });
     }
 
+    console.log("ssdd", credits)
+
     const userData = await db.user.findUnique({
       where: {
         externalId: userId,
