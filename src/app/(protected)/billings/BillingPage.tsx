@@ -6,7 +6,7 @@ import { createCheckoutSession } from "@/lib/stripe";
 import { api } from "@/trpc/react";
 import React, { useState } from "react";
 
-const BillingPage = ({ buttonClick }: { buttonClick: Function }) => {
+const BillingPage = () => {
   const { data: user } = api.project.getMyCredits.useQuery();
   const [creditToBuy, setCreditToBuy] = useState<number[]>([100]);
   const creditToBuyAmount = creditToBuy[0]!;
@@ -21,14 +21,19 @@ const BillingPage = ({ buttonClick }: { buttonClick: Function }) => {
         <Slider
           defaultValue={[100]}
           max={1000}
-          min={10}
+          min={30}
           step={10}
           onValueChange={(value) => setCreditToBuy(value)}
           value={creditToBuy}
         />
       </div>
 
-      <Button className="mt-2" onClick={() => buttonClick(creditToBuyAmount)}>
+      <Button
+        className="mt-2"
+        onClick={() => {
+          createCheckoutSession(creditToBuyAmount);
+        }}
+      >
         Buy {creditToBuy} credits for ${price}
       </Button>
     </div>

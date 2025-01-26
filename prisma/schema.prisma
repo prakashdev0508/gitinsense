@@ -24,6 +24,18 @@ model User {
     questionAsked Int @default(0)
     aiUsed        Int @default(0)
 
+    createdAt         DateTime            @default(now())
+    updatedAt         DateTime            @updatedAt
+    StripeTransection StripeTransection[]
+}
+
+model StripeTransection {
+    id String @id @default(cuid())
+
+    userId String
+    user   User   @relation(fields: [userId], references: [externalId])
+    credit Int 
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -43,8 +55,6 @@ model Projects {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-
-
 }
 
 model SourceCodeEmbeddings {
@@ -91,11 +101,10 @@ model SavedAnswers {
     projectId String
 
     user   User   @relation(fields: [userId], references: [externalId])
-    userId String 
+    userId String
 
     isDeletedAt DateTime?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-
 }
