@@ -60,11 +60,17 @@ const CreateProject = ({
           setOpen(false);
         },
         onError: (error) => {
-          toast.error(
-            error.data?.zodError?.fieldErrors
-              ? JSON.stringify(error.data?.zodError?.fieldErrors)
-              : "Failed to create project ",
-          );
+          console.log("Err res" , error.message)
+          if(error.data?.zodError?.fieldErrors){
+            toast.error(
+              error.data?.zodError?.fieldErrors
+                ? JSON.stringify(error.data?.zodError?.fieldErrors)
+                : "Failed to create project ",
+            );
+
+          }else{
+            toast.error(error.message)
+          }
         },
       },
     );
