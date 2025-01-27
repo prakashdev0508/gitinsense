@@ -29,12 +29,22 @@ model User {
     StripeTransection StripeTransection[]
 }
 
+enum TransectionStatus {
+    INITIATED
+    COMPLETED
+    CANCELLED
+    FAILED
+}
+
 model StripeTransection {
     id String @id @default(cuid())
 
     userId String
     user   User   @relation(fields: [userId], references: [externalId])
-    credit Int 
+    credit Int
+
+    status         TransectionStatus @default(INITIATED)
+    transection_id String?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

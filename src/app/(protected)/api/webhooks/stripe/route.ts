@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function POST(request: Request) {
-  console.log("Yahaa ayaa ")
+  console.log("Yahaa ayaa ");
   const body = await request.text();
   const signature = (await headers()).get("Stripe-Signature") as string;
 
@@ -26,27 +26,25 @@ export async function POST(request: Request) {
 
   const session = event.data.object as Stripe.Checkout.Session;
 
-  console.log(event.type);
+  const userId = session.client_reference_id;
+  const transectionId = session.metadata?.["transectionId"];
 
   if (event.type == "checkout.session.completed") {
     const credits = Number(session?.metadata?.["credits"]);
-    const userId = session.client_reference_id;
 
     if (!userId || !credits) {
       return NextResponse.json({ error: "Invlaid" }, { status: 400 });
     }
 
-    console.log("sessionData " , session)
-
-
-    const trans = await db.stripeTransection.create({
+    await db.stripeTransection.update({
+      where: {
+        id: transectionId,
+      },
       data: {
-        userId: userId,
-        credit: credits,
+        status: "COMPLETED",
+        transection_id: session?.id,
       },
     });
-
-    console.log("Transs" , trans)
 
     await db.user.update({
       where: {
@@ -58,6 +56,17 @@ export async function POST(request: Request) {
         },
       },
     });
+  }else if(event.type == "charge.failed"){
+    await db.stripeTransection.update({
+      where: {
+        id: transectionId,
+      },
+      data: {
+        status: "FAILED",
+        transection_id: session?.id,
+      },
+    });
+
   }
 
   return NextResponse.json({
