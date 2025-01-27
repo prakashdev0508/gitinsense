@@ -104,7 +104,7 @@ const CreateProject = ({
           />
         </div>
         <div className="mb-4">
-          <label className="mb-1 block text-xs font-medium">GitHub URL</label>
+          <label className="mb-1 block text-xs font-medium">GitHub URL (public repos)</label>
           <input
             type="url"
             value={githubUrl}
@@ -113,7 +113,7 @@ const CreateProject = ({
             className="w-full rounded-md border p-2 text-sm"
           />
         </div>
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="mb-1 block text-xs font-medium">
             GitHub Token (Optional){" "}
           </label>
@@ -124,7 +124,7 @@ const CreateProject = ({
             placeholder="Giithub token"
             className="w-full rounded-md border p-2 text-sm"
           />
-        </div>
+        </div> */}
         <div className="w-full">
           <Button
             onClick={handleCreate}
