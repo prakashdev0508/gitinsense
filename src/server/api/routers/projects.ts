@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { pollCommits } from "@/lib/githubData";
 import { indexGithubRepo } from "@/lib/github-loader";
+import { pricingData } from "@/utils/constant";
 
 export const projectRouter = createTRPCRouter({
   createProject: protectedProcedure
@@ -23,6 +24,17 @@ export const projectRouter = createTRPCRouter({
       });
 
       await pollCommits(project.id);
+      await indexGithubRepo(project.id, project.githubUrl);
+      await ctx.db.user.update({
+        where: {
+          externalId: ctx.user.userId!,
+        },
+        data: {
+          credits: {
+            decrement: pricingData.projectSetup,
+          },
+        },
+      });
       return true;
     }),
   getProjects: protectedProcedure.query(async ({ ctx, input }) => {
@@ -100,4 +112,10 @@ export const projectRouter = createTRPCRouter({
       });
       return project;
     }),
+  getMyCredits: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.user.findUnique({
+      where: { externalId: ctx.user.userId! },
+      select: { credits: true, email: true },
+    });
+  }),
 });

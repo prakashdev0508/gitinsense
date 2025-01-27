@@ -2,6 +2,8 @@ import { GithubRepoLoader } from "@langchain/community/document_loaders/web/gith
 import { Document } from "@langchain/core/documents";
 import { generateEmbedding, summeriseCode } from "./chatgpt";
 import { db } from "@/server/db";
+import { pricingData } from "@/utils/constant";
+import { auth } from "@clerk/nextjs/server";
 
 export const loadGithubRepo = async (
   githubUrl: string,
@@ -72,6 +74,8 @@ export const indexGithubRepo = async (
   const docs = await loadGithubRepo(githubUrl, githubToken);
   const allEmbeddings = await getEmbaddings(docs);
 
+  const { userId } = await auth();
+
   await Promise.allSettled(
     allEmbeddings.map(async (embedding, index) => {
       if (!embedding) return;
@@ -98,6 +102,17 @@ export const indexGithubRepo = async (
       `;
     }),
   );
+
+  await db.user.update({
+    where: {
+      externalId: userId as string,
+    },
+    data: {
+      credits: {
+        decrement: pricingData.eachprojectRefresh,
+      },
+    },
+  });
 };
 
 export const getEmbaddings = async (docs: Document[]) => {

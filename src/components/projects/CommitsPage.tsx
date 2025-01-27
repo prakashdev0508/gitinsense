@@ -11,6 +11,7 @@ import useRefetch from "@/hooks/use-refetch";
 import { toast } from "sonner";
 import { generateToken } from "@/utils/jwtTokens";
 import Link from "next/link";
+import { pricingData } from "@/utils/constant";
 
 export default function CommitsPage({ projectId }: { projectId: string }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,6 +60,9 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
     currentPage * commitsPerPage,
   );
 
+  const { data: user } = api.project.getMyCredits.useQuery();
+
+
   const generateShareableLink = (commitId: string) => {
     try {
       const token = generateToken(commitId); // Ensure commitId is correct
@@ -104,6 +108,14 @@ export default function CommitsPage({ projectId }: { projectId: string }) {
                     title="Refresh commits"
                     variant={"secondary"}
                     onClick={() => {
+                          if (
+                            Number(user?.credits) <
+                            Number( pricingData.commitRefresh)
+                          ) {
+                            return toast.error(
+                              `Project creation required ${ pricingData.commitRefresh} token please recharge`,
+                            );
+                          }
                       if (!fetchNewCommits.isPending) {
                         fetchNewCommits.mutate(
                           {

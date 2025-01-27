@@ -4,6 +4,7 @@ import { api } from "@/trpc/react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import useRefetch from "@/hooks/use-refetch";
+import { pricingData } from "@/utils/constant";
 
 const CreateProject = ({
   open,
@@ -25,10 +26,24 @@ const CreateProject = ({
   };
 
   const createProject = api.project.createProject.useMutation();
+  const { data: user } = api.project.getMyCredits.useQuery();
 
   const handleCreate = () => {
     if (name.trim() == "" || githubUrl.trim() == "") {
       return toast.error("Please fill all details");
+    }
+
+    if (
+      Number(user?.credits) <
+      Number(
+        pricingData.projectSetup +
+          pricingData.eachprojectRefresh +
+          pricingData.commitRefresh,
+      )
+    ) {
+      return toast.error(
+        `Project creation required ${pricingData.projectSetup + pricingData.eachprojectRefresh + pricingData.commitRefresh} token please recharge`,
+      );
     }
 
     createProject.mutate(
@@ -64,7 +79,7 @@ const CreateProject = ({
       }}
     >
       <div
-        className="md:w-[40vw] w-96 rounded-md bg-white p-6 shadow-lg"
+        className="w-96 rounded-md bg-white p-6 shadow-lg md:w-[40vw]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between">

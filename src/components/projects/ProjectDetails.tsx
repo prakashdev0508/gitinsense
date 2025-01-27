@@ -6,9 +6,12 @@ import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
+import { pricingData } from "@/utils/constant";
 
 const ProjectDetails = ({ projectData }: any) => {
   const fetchNewCommits = api.project.refreshProject.useMutation();
+  const { data: user } = api.project.getMyCredits.useQuery();
+
   return (
     <div>
       <div className="flex justify-between">
@@ -35,6 +38,13 @@ const ProjectDetails = ({ projectData }: any) => {
             title="Refresh commits"
             variant={"secondary"}
             onClick={() => {
+              if (
+                Number(user?.credits) < Number(pricingData.eachprojectRefresh)
+              ) {
+                return toast.error(
+                  `Project refresh required ${pricingData.eachprojectRefresh} token please recharge`,
+                );
+              }
               if (!fetchNewCommits.isPending) {
                 fetchNewCommits.mutate(
                   {
