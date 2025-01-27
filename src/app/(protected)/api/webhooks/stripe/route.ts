@@ -32,21 +32,16 @@ export async function POST(request: Request) {
     const credits = Number(session?.metadata?.["credits"]);
     const userId = session.client_reference_id;
 
-    if (!userId || credits) {
+    if (!userId || !credits) {
       return NextResponse.json({ error: "Invlaid" }, { status: 400 });
     }
 
-    console.log("ssdd", credits)
+    console.log("sessionData " , session)
 
-    const userData = await db.user.findUnique({
-      where: {
-        externalId: userId,
-      },
-    });
 
     const trans = await db.stripeTransection.create({
       data: {
-        userId: userData?.id as string,
+        userId: userId,
         credit: credits,
       },
     });

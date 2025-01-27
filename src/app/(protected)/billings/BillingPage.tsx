@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { createCheckoutSession } from "@/lib/stripe";
 import { api } from "@/trpc/react";
+import { useUser } from "@clerk/nextjs";
 import React, { useState } from "react";
 
 const BillingPage = () => {
@@ -31,7 +32,7 @@ const BillingPage = () => {
       <Button
         className="mt-2"
         onClick={() => {
-          createCheckoutSession(creditToBuyAmount);
+          createCheckoutSession(creditToBuyAmount, user?.email!);
         }}
       >
         Buy {creditToBuy} credits for ${price}

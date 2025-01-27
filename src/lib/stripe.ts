@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY! , {
     apiVersion : "2024-12-18.acacia"
 })
 
-export async function createCheckoutSession(credits :number) {
+export async function createCheckoutSession(credits :number , email : string) {
 
     const  {userId} = await auth()
 
@@ -31,6 +31,7 @@ export async function createCheckoutSession(credits :number) {
             }
         ],
         customer_creation : "always",
+        customer_email :  email,
         mode : "payment",
         success_url : `${process.env.NEXT_PUBLIC_APP_URL}/create`,
         cancel_url : `${process.env.NEXT_PUBLIC_APP_URL}/billings`,
