@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import useProjects from "@/hooks/use-projects";
 import { askQuestion } from "./actions";
 import { readStreamableValue } from "ai/rsc";
 import { toast } from "sonner";
@@ -11,6 +10,8 @@ import MDeditor from "@uiw/react-md-editor";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { api } from "@/trpc/react";
 import { Download, LoaderCircle, SaveIcon } from "lucide-react";
+import { pricingData } from "@/utils/constant";
+import useRefetch from "@/hooks/use-refetch";
 
 const AskQuestion = ({ projectData }: any) => {
   const [question, setQuestion] = useState("");
@@ -18,7 +19,10 @@ const AskQuestion = ({ projectData }: any) => {
   const [answer, setAnswer] = useState("");
   const [open, setOpen] = useState(false);
 
+  const refetch = useRefetch();
+
   const saveQuestion = api.saveQuestion.createSaveQuestion.useMutation();
+  const reduceAskQuestionCredit = api.project.reduceCredits.useMutation();
 
   const handleSubmit = async () => {
     if (question.trim() == "") {
@@ -41,6 +45,8 @@ const AskQuestion = ({ projectData }: any) => {
         }
       }
 
+      reduceAskQuestionCredit.mutate({ credit: pricingData.perQuestionAsk });
+      refetch();
       setLoading(false);
     } catch (error) {
       toast.error("Error while ");

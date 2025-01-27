@@ -32,6 +32,8 @@ export async function POST(request: Request) {
   if (event.type == "checkout.session.completed") {
     const credits = Number(session?.metadata?.["credits"]);
 
+    console.log("sess" , session)
+
     if (!userId || !credits) {
       return NextResponse.json({ error: "Invlaid" }, { status: 400 });
     }
@@ -56,7 +58,7 @@ export async function POST(request: Request) {
         },
       },
     });
-  }else if(event.type == "charge.failed"){
+  } else if (event.type == "charge.failed") {
     await db.stripeTransection.update({
       where: {
         id: transectionId,
@@ -66,7 +68,6 @@ export async function POST(request: Request) {
         transection_id: session?.id,
       },
     });
-
   }
 
   return NextResponse.json({
