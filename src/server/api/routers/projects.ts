@@ -14,31 +14,36 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const checkGithub = await validateGithubUrl(input.githubUrl);
 
-      const checkGithub = await validateGithubUrl(input.githubUrl)
+      if (!checkGithub) {
+        throw new Error("Error validating github url");
+      }
 
-      const project = await ctx.db.projects.create({
-        data: {
-          name: input.name,
-          githubUrl: input.githubUrl,
-          githubToken: input.githubToken,
-          userId: ctx.user.userId!,
-        },
-      });
-
-      await pollCommits(project.id);
-      await indexGithubRepo(project.id, project.githubUrl);
-      await ctx.db.user.update({
-        where: {
-          externalId: ctx.user.userId!,
-        },
-        data: {
-          credits: {
-            decrement: pricingData.projectSetup,
+      if (checkGithub) {
+        const project = await ctx.db.projects.create({
+          data: {
+            name: input.name,
+            githubUrl: input.githubUrl,
+            githubToken: input.githubToken,
+            userId: ctx.user.userId!,
           },
-        },
-      });
-      return true;
+        });
+
+        await pollCommits(project.id);
+        await indexGithubRepo(project.id, project.githubUrl);
+        await ctx.db.user.update({
+          where: {
+            externalId: ctx.user.userId!,
+          },
+          data: {
+            credits: {
+              decrement: pricingData.projectSetup,
+            },
+          },
+        });
+        return true;
+      }
     }),
   getProjects: protectedProcedure.query(async ({ ctx, input }) => {
     const projects = await ctx.db.projects.findMany({
