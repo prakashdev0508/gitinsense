@@ -2,6 +2,8 @@ import { db } from "@/server/db";
 import { Octokit } from "octokit";
 import axios from "axios";
 import { aisummeriseCommit } from "./chatgpt";
+import { auth } from "@clerk/nextjs/server";
+import { pricingData } from "@/utils/constant";
 
 export const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
@@ -23,6 +25,7 @@ type Response = {
 };
 
 export const pollCommits = async (projectId: string) => {
+  const {userId} = await auth()
   try {
     const { project, githubUrl } = await fetchgithubUrl(projectId);
     if (!project || !githubUrl) {
@@ -70,6 +73,16 @@ export const pollCommits = async (projectId: string) => {
       .filter((log): log is NonNullable<typeof log> => log !== null);
 
     await db.commitLogs.createMany({ data: commitLogs });
+    await db.user.update({
+      where: {
+        externalId: userId as string,
+      },
+      data: {
+        credits: {
+          decrement: pricingData.commitRefresh,
+        },
+      },
+    });
     return true;
   } catch (error) {
     console.error("Error polling commits:", error);
