@@ -6,6 +6,9 @@ export const transectionRouter = createTRPCRouter({
     const transectionData = await ctx.db.stripeTransection.findMany({
       where: {
         userId: ctx.user.userId!,
+        status: {
+          not: "INITIATED",
+        },
       },
     });
     return transectionData;

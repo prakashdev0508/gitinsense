@@ -23,12 +23,20 @@ const AskQuestion = ({ projectData }: any) => {
 
   const saveQuestion = api.saveQuestion.createSaveQuestion.useMutation();
   const reduceAskQuestionCredit = api.project.reduceCredits.useMutation();
+  const { data: user } = api.project.getMyCredits.useQuery();
+  
 
   const handleSubmit = async () => {
     if (question.trim() == "") {
       return;
     }
+
     if (!projectData) return;
+
+    if(Number(user?.credits) < Number(pricingData.perQuestionAsk)){
+      return toast.error(`Ask question required ${pricingData.perQuestionAsk} tokens please recharge `)
+    }
+
     setLoading(true);
     try {
       const { output } = await askQuestion(

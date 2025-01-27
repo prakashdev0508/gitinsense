@@ -42,16 +42,6 @@ const data = {
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
   ],
 };
 
@@ -62,7 +52,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return {
       title: project.name,
       url: `/project/${project?.id}`,
-      id : project?.id
+      id: project?.id,
     };
   });
 
@@ -76,11 +66,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Q&A",
       url: "/saved-answer",
       icon: Bot,
-    },
-    {
-      title: "Meetings",
-      url: "/meetings",
-      icon: Tv,
     },
     {
       title: "Repositories",
