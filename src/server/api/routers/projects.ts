@@ -118,4 +118,23 @@ export const projectRouter = createTRPCRouter({
       select: { credits: true, email: true },
     });
   }),
+
+  reduceCredits: protectedProcedure
+    .input(
+      z.object({
+        credit: z.number().nonnegative(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.user.update({
+        where: {
+          externalId: ctx.user.userId!,
+        },
+        data: {
+          credits: {
+            decrement: input.credit,
+          },
+        },
+      });
+    }),
 });

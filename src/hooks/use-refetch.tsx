@@ -6,7 +6,7 @@ const useRefetch = () => {
 
     return async()=>{
         await queryClient.refetchQueries({
-            type : "active"
+            type : "all"
         })
     }
 }
