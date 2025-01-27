@@ -130,7 +130,7 @@ export const validateGithubUrl = async (githubUrl: string): Promise<boolean> => 
     });
 
     // If the API call succeeds, the repository exists
-    return response.status === 200;
+    return true;
   } catch (error: any) {
     console.error("Error validating GitHub URL:", error.message);
 
