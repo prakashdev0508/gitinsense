@@ -113,6 +113,38 @@ export const fetchgithubUrl = async (projectId: string) => {
   };
 };
 
+
+export const validateGithubUrl = async (githubUrl: string): Promise<boolean> => {
+  try {
+    // Extract the owner and repo name from the URL
+    const [owner, repo] = githubUrl.split("/").slice(-2);
+
+    if (!owner || !repo) {
+      throw new Error("Invalid GitHub repository URL structure");
+    }
+
+    // Check if the repository exists
+    const response = await octokit.rest.repos.get({
+      owner,
+      repo,
+    });
+
+    // If the API call succeeds, the repository exists
+    return response.status === 200;
+  } catch (error: any) {
+    console.error("Error validating GitHub URL:", error.message);
+
+    // If the repository is not found or an API error occurs, return false
+    if (error.status === 404) {
+      return false;
+    }
+
+    // Handle other errors (e.g., rate limits, auth issues)
+    throw new Error("Failed to validate GitHub URL. Please try again later.");
+  }
+};
+
+
 export const getCommits = async (githubUrl: string) => {
   const [owner, repo] = githubUrl.split("/").slice(-2);
 
