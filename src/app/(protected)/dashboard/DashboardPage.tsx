@@ -1,13 +1,34 @@
 "use client";
 import React, { useState } from "react";
-import { Folder, Zap, FileText, HelpCircle } from "lucide-react";
+import { Folder, Zap, FileText, HelpCircle, CoinsIcon } from "lucide-react";
 import { api } from "@/trpc/react";
 import CreateProject from "@/components/shared/CreateProject";
+
+const SkeletonCard = () => (
+  <div className="animate-pulse rounded-lg bg-white p-6 shadow">
+    <div className="flex items-center justify-between">
+      <div>
+        <div className="mb-2 h-4 w-32 rounded bg-gray-300"></div>
+        <div className="h-6 w-16 rounded bg-gray-300"></div>
+      </div>
+      <div className="h-12 w-12 rounded-lg bg-gray-300"></div>
+    </div>
+  </div>
+);
+
+const SkeletonActivity = () => (
+  <li className="mb-4 flex animate-pulse items-center space-x-4">
+    <div className="h-10 w-10 rounded-full bg-gray-300"></div>
+    <div>
+      <div className="mb-2 h-4 w-96 rounded bg-gray-300"></div>
+      <div className="h-3 w-24 rounded bg-gray-300"></div>
+    </div>
+  </li>
+);
 
 const DashboardPage = () => {
   const { data: dashboardData, isLoading } =
     api.dashboard.getDashboardDetails.useQuery();
-
   const [openCreateProject, setOpenCreateProject] = useState(false);
 
   return (
@@ -15,157 +36,99 @@ const DashboardPage = () => {
       <div className="p-4 md:p-6">
         {/* Header Stats */}
         <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {/* Card 1 */}
-          <div className="rounded-lg bg-white p-6 shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  Total Repositories
-                </h3>
-                <p className="text-2xl font-bold text-gray-800">
-                  {isLoading ? <>Loading..</> : <>4</>}
-                </p>
-              </div>
-              <div className="rounded-lg bg-gray-50 p-2">
-                <Folder className="h-8 w-8 text-blue-500" />
-              </div>
-            </div>
-            <p className="mt-2 text-sm text-green-500">↑ 12% from last month</p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="rounded-lg bg-white p-6 shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  Analyzed Commits
-                </h3>
-                <p className="text-2xl font-bold text-gray-800">1,284</p>
-              </div>
-              <div className="rounded-lg bg-gray-50 p-2">
-                <Zap className="h-8 w-8 text-purple-500" />
-              </div>
-            </div>
-            <p className="mt-2 text-sm text-green-500">↑ 8% from last month</p>
-          </div>
-
-          {/* Card 3 */}
-          <div className="rounded-lg bg-white p-6 shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  AI Summaries
-                </h3>
-                <p className="text-2xl font-bold text-gray-800">856</p>
-              </div>
-              <div className="rounded-lg bg-gray-50 p-2">
-                <FileText className="h-8 w-8 text-green-500" />
-              </div>
-            </div>
-            <p className="mt-2 text-sm text-green-500">↑ 15% from last month</p>
-          </div>
-
-          {/* Card 4 */}
-          <div className="rounded-lg bg-white p-6 shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">
-                  AI Questions
-                </h3>
-                <p className="text-2xl font-bold text-gray-800">142</p>
-              </div>
-              <div className="rounded-lg bg-gray-50 p-2">
-                <HelpCircle className="h-8 w-8 text-yellow-500" />
-              </div>
-            </div>
-            <p className="mt-2 text-sm text-green-500">↑ 5% from last month</p>
-          </div>
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <SkeletonCard key={index} />
+              ))
+            : [
+                {
+                  label: "Remaining Credits",
+                  value: dashboardData?.creditCount?.credits,
+                  icon: CoinsIcon,
+                  color: "text-green-500",
+                },
+                {
+                  label: "Total Repositories",
+                  value: dashboardData?.repoCount,
+                  icon: Folder,
+                  color: "text-blue-500",
+                },
+                {
+                  label: "Analyzed Commits",
+                  value: dashboardData?.commitCounts,
+                  icon: Zap,
+                  color: "text-purple-500",
+                },
+                {
+                  label: "Saved Questions",
+                  value: dashboardData?.aiQuestionsCount,
+                  icon: HelpCircle,
+                  color: "text-yellow-500",
+                },
+              ].map(({ label, value, icon: Icon, color }, index) => (
+                <div key={index} className="rounded-lg bg-white p-6 shadow">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">
+                        {label}
+                      </h3>
+                      <p className="text-2xl font-bold text-gray-800">
+                        {value ?? 0}
+                      </p>
+                    </div>
+                    <div className="rounded-lg bg-gray-50 p-2">
+                      <Icon className={`h-8 w-8 ${color}`} />
+                    </div>
+                  </div>
+                </div>
+              ))}
         </div>
 
-        {/* Recent Activity and Quick Actions */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Recent Activity */}
-          <div className="col-span-2 rounded-lg bg-white p-6 shadow">
+        {/* Recent Activity */}
+        <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
+          <div className="col-span-3 rounded-lg bg-white p-6 shadow">
             <h3 className="mb-4 text-lg font-bold text-gray-800">
-              Recent Activity
+              Recent Commit Activity
             </h3>
             <ul>
-              <li className="mb-4 flex items-center space-x-4">
-                <img
-                  src="/avatar.png"
-                  alt="User avatar"
-                  className="h-10 w-10 rounded-full"
-                />
-                <div>
-                  <p className="text-sm text-gray-800">
-                    <span className="font-bold">Analyzed repository</span>{" "}
-                    frontend-project
-                  </p>
-                  <p className="text-xs text-gray-500">2 minutes ago</p>
-                </div>
-              </li>
-              <li className="mb-4 flex items-center space-x-4">
-                <img
-                  src="/avatar.png"
-                  alt="User avatar"
-                  className="h-10 w-10 rounded-full"
-                />
-                <div>
-                  <p className="text-sm text-gray-800">
-                    <span className="font-bold">
-                      Generated summary for commit
-                    </span>{" "}
-                    <span className="rounded bg-gray-100 px-2 py-1 font-mono">
-                      a4b2c6d
-                    </span>
-                  </p>
-                  <p className="text-xs text-gray-500">15 minutes ago</p>
-                </div>
-              </li>
-              <li className="flex items-center space-x-4">
-                <img
-                  src="/avatar.png"
-                  alt="User avatar"
-                  className="h-10 w-10 rounded-full"
-                />
-                <div>
-                  <p className="text-sm text-gray-800">
-                    <span className="font-bold">Asked question about</span> API
-                    implementation
-                  </p>
-                  <p className="text-xs text-gray-500">1 hour ago</p>
-                </div>
-              </li>
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, index) => (
+                  <SkeletonActivity key={index} />
+                ))
+              ) : dashboardData?.recentActivity.length ? (
+                dashboardData.recentActivity.map((activity) => (
+                  <li
+                    key={activity.id}
+                    className="mb-4 flex items-center space-x-4"
+                  >
+                    <img
+                      src={activity.commitAuthorImage}
+                      alt="User avatar"
+                      className="h-10 w-10 rounded-full"
+                    />
+                    <div>
+                      <p className="text-sm text-gray-800">
+                        <span className="font-bold">Commit:</span>{" "}
+                        {activity.commitMesage} in
+                        <span className="font-bold">
+                          {" "}
+                          {activity.project.name}
+                        </span>
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(activity.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <p>No recent activity found.</p>
+              )}
             </ul>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="rounded-lg bg-white p-6 shadow">
-            <h3 className="mb-4 text-lg font-bold text-gray-800">
-              Quick Actions
-            </h3>
-            <div className="space-y-4">
-              <button
-                className="flex w-full items-center justify-between rounded-lg bg-blue-50 px-4 py-2 text-blue-700"
-                onClick={() => {
-                  setOpenCreateProject(!openCreateProject);
-                }}
-              >
-                <span>Add Repository</span>
-                <Folder className="h-5 w-5" />
-              </button>
-              <button className="flex w-full items-center justify-between rounded-lg bg-purple-50 px-4 py-2 text-purple-700">
-                <span>Generate Summary</span>
-                <FileText className="h-5 w-5" />
-              </button>
-              <button className="flex w-full items-center justify-between rounded-lg bg-green-50 px-4 py-2 text-green-700">
-                <span>Ask Question</span>
-                <HelpCircle className="h-5 w-5" />
-              </button>
-            </div>
           </div>
         </div>
       </div>
+
       {openCreateProject && (
         <CreateProject
           open={openCreateProject}
