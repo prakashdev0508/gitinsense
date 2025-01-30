@@ -75,7 +75,7 @@ const BillingPage = () => {
             }}
             disabled={loading}
           >
-            {loading ? "Loading..." : `Buy ${creditToBuy} credits for ${price}`}
+            {loading ? "Loading..." : `Buy ${creditToBuy} credits for $${price}`}
           </Button>
         </>
       )}
