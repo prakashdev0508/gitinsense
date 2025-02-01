@@ -4,6 +4,7 @@ import { generateEmbedding, summeriseCode } from "./chatgpt";
 import { db } from "@/server/db";
 import { pricingData } from "@/utils/constant";
 import { auth } from "@clerk/nextjs/server";
+import { aisummeriseCommitchatGpt } from "./chatGptconfig";
 
 export const loadGithubRepo = async (
   githubUrl: string,
@@ -118,7 +119,8 @@ export const indexGithubRepo = async (
 export const getEmbaddings = async (docs: Document[]) => {
   const embeddings = await Promise.all(
     docs.map(async (doc) => {
-      const summery = await summeriseCode(doc);
+      const summery = await aisummeriseCommitchatGpt(doc);
+      console.log("Summ" , summery)
       const embedding = await generateEmbedding(summery);
       return {
         summary: summery,
