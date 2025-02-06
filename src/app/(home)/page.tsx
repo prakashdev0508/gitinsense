@@ -13,7 +13,7 @@ const page = () => {
       <FeaturesSection />
       <StepsSection />
       <AICapabilitiesSection />
-      <Pricing />
+      {/* <Pricing /> */}
       {/* <TeamCollaboration /> */}
       <CallToAction   />
     </div>

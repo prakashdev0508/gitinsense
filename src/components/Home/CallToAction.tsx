@@ -1,4 +1,5 @@
 import { Zap, Lock, CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function CallToAction() {
   return (
@@ -42,10 +43,12 @@ export default function CallToAction() {
 
         {/* Call-to-Action Buttons */}
         <div className="mt-10 flex flex-col md:flex-row justify-center items-center gap-4">
+          <Link href={"/sign-up"}>
           <button className="bg-blue-600 text-white font-bold py-3 px-6 rounded-md shadow-lg hover:bg-blue-700 transition flex items-center">
             Get Started Free
             <span className="ml-2">→</span>
           </button>
+          </Link>
           <button className="bg-gray-800 text-white font-bold py-3 px-6 rounded-md shadow-lg hover:bg-gray-700 transition flex items-center">
             Schedule Demo
             <span className="ml-2">🎥</span>

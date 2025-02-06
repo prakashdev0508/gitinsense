@@ -39,17 +39,17 @@ const HeroSection = () => {
 
               {/* CTA Section */}
               <div className="mt-10 flex flex-col items-center gap-10">
-                <div className="flex w-full max-w-md items-center gap-6">
+                <div className="flex w-full max-w-md justify-center items-center gap-6">
                   <Link href={"/sign-up"}>
                     <Button size="lg" className="">
                       Get Started
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <Button size="lg">
+                  {/* <Button size="lg">
                     <Play className="h-4 w-4" />
                     Watch Demo
-                  </Button>
+                  </Button> */}
                 </div>
 
                 {/* Features List */}

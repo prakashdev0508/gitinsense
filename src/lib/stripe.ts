@@ -30,7 +30,7 @@ export async function createCheckoutSession(credits: number, email: string) {
         price_data: {
           currency: "usd",
           product_data: {
-            name: `${credits} Github ai Credits `,
+            name: `${credits} gitinsense Credits `,
           },
           unit_amount: Math.round((credits / 50) * 100),
         },
