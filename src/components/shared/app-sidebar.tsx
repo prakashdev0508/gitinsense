@@ -38,7 +38,7 @@ const data = {
   },
   teams: [
     {
-      name: "Github Ai",
+      name: "Gitinsense",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },

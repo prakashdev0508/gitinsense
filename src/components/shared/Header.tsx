@@ -15,7 +15,7 @@ const Header = () => {
       <div className="container mx-auto flex items-center justify-between px-6 py-4">
         {/* Logo Section */}
         <div className="text-xl font-bold">
-          <Link href="/">Logo</Link>
+          <Link href="/">Gitinsense</Link>
         </div>
 
         {/* Authentication Buttons */}
