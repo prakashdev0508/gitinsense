@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useAuth } from "@clerk/nextjs"; // Clerk's authentication hook
+import { SignOutButton, useAuth } from "@clerk/nextjs"; // Clerk's authentication hook
 import { UserButton } from "@clerk/nextjs"; // Clerk's user profile button
 import { Button } from "../ui/button";
 import Link from "next/link";
