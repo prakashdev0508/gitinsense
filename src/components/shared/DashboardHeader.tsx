@@ -40,7 +40,10 @@ const DashboardHeader = () => {
             New Repo
           </Button>
         </div>
-        <UserButton afterSignOutUrl="/" />
+        <SignOutButton>
+          <LogOutIcon />
+        </SignOutButton>
+        {/* <UserButton afterSignOutUrl="/" /> */}
       </div>
 
       {open && <CreateProject open={open} setOpen={setOpen} />}
