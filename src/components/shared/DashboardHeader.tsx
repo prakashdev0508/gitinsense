@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { SidebarTrigger } from "../ui/sidebar";
 import { SignOutButton, UserButton } from "@clerk/nextjs";
 import { Button } from "../ui/button";
-import { LogOutIcon, Search } from "lucide-react";
+import { InfoIcon, LogOutIcon, Search, X } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Input } from "../ui/input";
 import CreateProject from "./CreateProject";
@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 const DashboardHeader = () => {
   const { projects } = useProjects();
   const [open, setOpen] = useState<boolean>(false);
+  const [openLogout, setOpenLogout] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -43,15 +44,63 @@ const DashboardHeader = () => {
             New Repo
           </Button>
         </div>
-        <div className="cursor-pointer" onClick={() => router.push("/")}>
-          <SignOutButton>
-            <LogOutIcon />
-          </SignOutButton>
+        <div className="cursor-pointer" onClick={() => setOpenLogout(true)}>
+          <LogOutIcon />
         </div>
         {/* <UserButton afterSignOutUrl="/" /> */}
       </div>
 
       {open && <CreateProject open={open} setOpen={setOpen} />}
+      <>
+        {openLogout && (
+          <>
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+              onClick={() => {
+                setOpenLogout(false);
+              }}
+            >
+              <div
+                className="w-96 rounded-md bg-white p-6 shadow-lg md:w-[40vw]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between">
+                  <h2 className="mb-2 text-lg font-semibold">
+                    Are You sure want to Logout{" "}
+                  </h2>
+                  <div className="cursor-pointer">
+                    <X
+                      onClick={() => {
+                        setOpenLogout(false);
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="flex w-full items-center rounded-lg border border-gray-300 bg-blue-100 p-4 shadow-sm">
+                  <InfoIcon className="text-blue-500" />
+                  <div className="ml-2 items-center align-middle text-sm font-bold text-gray-600">
+                    After logout you will be redirected to the home page
+                  </div>
+                </div>
+                <div className="mt-12 grid w-full grid-cols-2 gap-4">
+                  <SignOutButton>
+                    <Button
+                      variant={"outline"}
+                      onClick={() => {
+                        router.push("/");
+                        setOpenLogout(false);
+                      }}
+                    >
+                      Logout
+                    </Button>
+                  </SignOutButton>
+                  <Button onClick={() => setOpenLogout(false)}>Cancel</Button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </>
     </>
   );
 };
