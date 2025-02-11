@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { SidebarTrigger } from "../ui/sidebar";
-import { UserButton } from "@clerk/nextjs";
+import { SignOutButton, UserButton } from "@clerk/nextjs";
 import { Button } from "../ui/button";
-import { Search } from "lucide-react";
+import { LogOutIcon, Search } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Input } from "../ui/input";
 import CreateProject from "./CreateProject";
@@ -40,7 +40,7 @@ const DashboardHeader = () => {
             New Repo
           </Button>
         </div>
-        <UserButton />
+        <UserButton afterSignOutUrl="/" />
       </div>
 
       {open && <CreateProject open={open} setOpen={setOpen} />}
