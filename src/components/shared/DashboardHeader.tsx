@@ -9,10 +9,13 @@ import { Separator } from "../ui/separator";
 import { Input } from "../ui/input";
 import CreateProject from "./CreateProject";
 import useProjects from "@/hooks/use-projects";
+import { useRouter } from "next/navigation";
 
 const DashboardHeader = () => {
   const { projects } = useProjects();
   const [open, setOpen] = useState<boolean>(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     if (projects?.length == 0) {
@@ -40,9 +43,11 @@ const DashboardHeader = () => {
             New Repo
           </Button>
         </div>
-        <SignOutButton>
-          <LogOutIcon />
-        </SignOutButton>
+        <div className="cursor-pointer" onClick={() => router.push("/")}>
+          <SignOutButton>
+            <LogOutIcon />
+          </SignOutButton>
+        </div>
         {/* <UserButton afterSignOutUrl="/" /> */}
       </div>
 
