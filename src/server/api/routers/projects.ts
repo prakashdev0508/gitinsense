@@ -18,7 +18,7 @@ export const projectRouter = createTRPCRouter({
 
       if (!checkGithub) {
         throw new Error("Error validating github url");
-      }
+      } 
 
       if (checkGithub) {
         const project = await ctx.db.projects.create({
