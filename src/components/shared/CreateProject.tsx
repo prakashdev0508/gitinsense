@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { toast } from "sonner";
 import useRefetch from "@/hooks/use-refetch";
 import { pricingData } from "@/utils/constant";
+import { useRouter } from "next/navigation";
 
 const CreateProject = ({
   open,
@@ -27,6 +28,8 @@ const CreateProject = ({
 
   const createProject = api.project.createProject.useMutation();
   const { data: user } = api.project.getMyCredits.useQuery();
+
+  const router = useRouter()
 
   const handleCreate = () => {
     if (name.trim() == "" || githubUrl.trim() == "") {
@@ -53,10 +56,11 @@ const CreateProject = ({
         githubToken: githubToken,
       },
       {
-        onSuccess: async () => {
+        onSuccess: async (data : any) => {
           toast.success("Project created successfully");
           refetch();
           clearData();
+          router.push(`/project/${data.id}`)
           setOpen(false);
         },
         onError: (error) => {

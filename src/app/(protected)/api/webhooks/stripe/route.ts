@@ -8,7 +8,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function POST(request: Request) {
-  console.log("Yahaa ayaa ");
   const body = await request.text();
   const signature = (await headers()).get("Stripe-Signature") as string;
 
@@ -32,7 +31,6 @@ export async function POST(request: Request) {
   if (event.type == "checkout.session.completed") {
     const credits = Number(session?.metadata?.["credits"]);
 
-    console.log("sess" , session)
 
     if (!userId || !credits) {
       return NextResponse.json({ error: "Invlaid" }, { status: 400 });

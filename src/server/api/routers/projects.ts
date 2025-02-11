@@ -21,28 +21,31 @@ export const projectRouter = createTRPCRouter({
       }
 
       if (checkGithub) {
-        const project = await ctx.db.projects.create({
-          data: {
-            name: input.name,
-            githubUrl: input.githubUrl,
-            githubToken: input.githubToken,
-            userId: ctx.user.userId!,
-          },
-        });
-
-        await pollCommits(project.id);
-        await indexGithubRepo(project.id, project.githubUrl);
-        await ctx.db.user.update({
-          where: {
-            externalId: ctx.user.userId!,
-          },
-          data: {
-            credits: {
-              decrement: pricingData.projectSetup,
+        await ctx.db.$transaction(async (tx) => {
+          const project = await tx.projects.create({
+            data: {
+              name: input.name,
+              githubUrl: input.githubUrl,
+              githubToken: input.githubToken,
+              userId: ctx.user.userId!,
             },
-          },
+          });
+
+          await pollCommits(project.id);
+          await indexGithubRepo(project.id, project.githubUrl);
+          await tx.user.update({
+            where: {
+              externalId: ctx.user.userId!,
+            },
+            data: {
+              credits: {
+                decrement: pricingData.projectSetup,
+              },
+            },
+          });
+
+          return { id: project.id };
         });
-        return true;
       }
     }),
   getProjects: protectedProcedure.query(async ({ ctx, input }) => {
